@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="96">
+    <author>VertexDezign</author>
+    <version>0.1.0.0</version>
+    <title>
+        <en>Additional Inputs</en>
+        <de>Zusätzliche Eingaben</de>
+    </title>
+    <description>
+        <en>
+            <![CDATA[TODO]]>
+        </en>
+        <de>
+            <![CDATA[TODO]]>
+        </de>
+    </description>
+    <iconFilename>icon_AI.png</iconFilename>
+    <multiplayer supported="true"/>
+    <extraSourceFiles>
+        <sourceFile filename="GrisuDebug.lua"/>
+        <sourceFile filename="AI.lua"/>
+    </extraSourceFiles>
+
+    <actions>
+        <action name="VD_AI_LOWER_FRONT" category="VEHICLE"/>
+        <action name="VD_AI_LOWER_BACK" category="VEHICLE"/>
+        <action name="VD_AI_FOLD_FRONT" category="VEHICLE"/>
+        <action name="VD_AI_FOLD_BACK" category="VEHICLE"/>
+        <action name="VD_AI_ACTIVATE_FRONT" category="VEHICLE"/>
+        <action name="VD_AI_ACTIVATE_BACK" category="VEHICLE"/>
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="GG_AI_LOWER_FRONT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_v"/>
+        </actionBinding>
+        <actionBinding action="GG_AI_LOWER_BACK">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_v"/>
+        </actionBinding>
+        <actionBinding action="GG_AI_FOLD_FRONT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_x"/>
+        </actionBinding>
+        <actionBinding action="GG_AI_FOLD_BACK">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_x"/>
+        </actionBinding>
+        <actionBinding action="GG_AI_ACTIVATE_FRONT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_b"/>
+        </actionBinding>
+        <actionBinding action="GG_AI_ACTIVATE_BACK">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_b"/>
+        </actionBinding>
+    </inputBinding>
+
+
+</modDesc>
