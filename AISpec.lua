@@ -39,6 +39,7 @@ function AdditionalInputsSpec:onLoad(savegame)
     indicatorTipDuration = 3000 -- 3 seconds in milliseconds
   }
   self.spec_additionalInputs.debugger:setLogLvl(g_additionalInputs.specLogLevel)
+  self.spec_additionalInputs.debugger:trace("onLoad")
 end
 
 function AdditionalInputsSpec:onEnterVehicle(isControlling)
@@ -107,6 +108,14 @@ function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveF
     g_inputBinding:setActionEventTextPriority(indicatorRightOn, GS_PRIO_VERY_LOW)
     local _, indicatorOff = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_OFF", self, AdditionalInputsSpec.actionEventIndicatorOff, false, true, false, true, nil)
     g_inputBinding:setActionEventTextPriority(indicatorOff, GS_PRIO_VERY_LOW)
+
+    -- light
+    local _, frontLightOn = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_LIGHT_ON", self, AdditionalInputsSpec.actionEventFrontLightOn, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(frontLightOn, GS_PRIO_VERY_LOW)
+    local _, frontLightOff = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_LIGHT_OFF", self, AdditionalInputsSpec.actionEventFrontLightOff, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(frontLightOff, GS_PRIO_VERY_LOW)
+    local _, frontWorkLightOn = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_WORK_LIGHT_ON", self, AdditionalInputsSpec.actionEventFrontWorkLightOn, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(frontWorkLightOn, GS_PRIO_VERY_LOW)
 
     -- implements
     local _, lowerFrontEventId = self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_FRONT", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
@@ -193,10 +202,57 @@ function AdditionalInputsSpec:vdAISetTurnLightState(targetState)
     return
   end
 
-  self.spec_additionalInputs.debugger:info("sl.turnLightState: " .. tostring(sl.turnLightState) .. ", target: " .. tostring(targetState))
+  self.spec_additionalInputs.debugger:trace("sl.turnLightState: " .. tostring(sl.turnLightState) .. ", target: " .. tostring(targetState))
   if sl.turnLightState ~= targetState and sl.turnLightState ~= Lights.TURNLIGHT_HAZARD then
-    self.spec_additionalInputs.debugger:info("setTurn")
     self:setTurnLightState(targetState)
+  end
+end
+
+function AdditionalInputsSpec:actionEventFrontLightOn(actionName, inputValue, callbackState, isAnalog)
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+  -- we can toggle the light and it is currently off
+  if self:getCanToggleLight() then
+    --and (bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT) == 0 or bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_WORK_FRONT) == 1) then
+    if sl.numLightTypes >= 1 then
+      -- turn on frontLight
+      local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT)
+      -- turn off work light front
+      newMask = bitAND(newMask, bitNOT(2 ^ Lights.LIGHT_TYPE_WORK_FRONT))
+      self:setLightsTypesMask(newMask)
+    end
+  end
+end
+
+function AdditionalInputsSpec:actionEventFrontLightOff(actionName, inputValue, callbackState, isAnalog)
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+  -- we can toggle the light and it is currently off
+  if self:getCanToggleLight() and bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT) == 1 then
+    if sl.numLightTypes >= 1 then
+      -- turn of front light
+      local newMask = bitAND(sl.lightsTypesMask, bitNOT(2 ^ Lights.LIGHT_TYPE_DEFAULT))
+      self:setLightsTypesMask(newMask)
+    end
+  end
+end
+
+function AdditionalInputsSpec:actionEventFrontWorkLightOn(actionName, inputValue, callbackState, isAnalog)
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+  -- we can toggle the light and it is currently off
+  if self:getCanToggleLight() and bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_WORK_FRONT) == 0 then
+    if sl.numLightTypes >= 1 then
+      -- turn on front work lights
+      local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_WORK_FRONT)
+      self:setLightsTypesMask(newMask)
+    end
   end
 end
 

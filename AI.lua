@@ -112,8 +112,6 @@ local function init()
   g_additionalInputs = AdditionalInputs.init()
   -- install spec
   TypeManager.validateTypes = Utils.prependedFunction(TypeManager.validateTypes, installSpec)
-
-  return g_additionalInputs
 end
 
-_G.g_additionalInputs = init()
+init()

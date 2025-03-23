@@ -29,6 +29,7 @@
         <!-- light -->
         <action name="VD_AI_FRONT_LIGHT_ON" category="VEHICLE"/>
         <action name="VD_AI_FRONT_LIGHT_OFF" category="VEHICLE"/>
+        <action name="VD_AI_FRONT_WORK_LIGHT_ON" category="VEHICLE"/>
         <!-- implements -->
         <action name="VD_AI_LOWER_FRONT" category="VEHICLE"/>
         <action name="VD_AI_LOWER_BACK" category="VEHICLE"/>
