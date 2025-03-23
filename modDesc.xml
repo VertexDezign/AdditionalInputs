@@ -27,9 +27,12 @@
         <action name="VD_AI_INDICATOR_RIGHT_ON" category="VEHICLE"/>
         <action name="VD_AI_INDICATOR_OFF" category="VEHICLE"/>
         <!-- light -->
-        <action name="VD_AI_FRONT_LIGHT_ON" category="VEHICLE"/>
-        <action name="VD_AI_FRONT_LIGHT_OFF" category="VEHICLE"/>
+        <action name="VD_AI_LOW_BEAM_ON" category="VEHICLE"/>
+        <action name="VD_AI_LOW_BEAM_OFF" category="VEHICLE"/>
         <action name="VD_AI_FRONT_WORK_LIGHT_ON" category="VEHICLE"/>
+        <action name="VD_AI_HIGH_BEAM_ON" category="VEHICLE"/>
+        <action name="VD_AI_HIGH_BEAM_OFF_FLASH_TRIGGER" category="VEHICLE"/>
+        <action name="VD_AI_HIGH_BEAM_OFF_FLASH_RELEASE" category="VEHICLE"/>
         <!-- implements -->
         <action name="VD_AI_LOWER_FRONT" category="VEHICLE"/>
         <action name="VD_AI_LOWER_BACK" category="VEHICLE"/>

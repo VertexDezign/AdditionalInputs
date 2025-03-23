@@ -110,12 +110,16 @@ function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveF
     g_inputBinding:setActionEventTextPriority(indicatorOff, GS_PRIO_VERY_LOW)
 
     -- light
-    local _, frontLightOn = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_LIGHT_ON", self, AdditionalInputsSpec.actionEventFrontLightOn, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(frontLightOn, GS_PRIO_VERY_LOW)
-    local _, frontLightOff = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_LIGHT_OFF", self, AdditionalInputsSpec.actionEventFrontLightOff, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(frontLightOff, GS_PRIO_VERY_LOW)
+    local _, lowBeamOn = self:addActionEvent(spec.actionEvents, "VD_AI_LOW_BEAM_ON", self, AdditionalInputsSpec.actionEventLowBeamOn, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(lowBeamOn, GS_PRIO_VERY_LOW)
+    local _, lowBeamOff = self:addActionEvent(spec.actionEvents, "VD_AI_LOW_BEAM_OFF", self, AdditionalInputsSpec.actionEventLowBeamOff, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(lowBeamOff, GS_PRIO_VERY_LOW)
     local _, frontWorkLightOn = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_WORK_LIGHT_ON", self, AdditionalInputsSpec.actionEventFrontWorkLightOn, false, true, false, true, nil)
     g_inputBinding:setActionEventTextPriority(frontWorkLightOn, GS_PRIO_VERY_LOW)
+
+    self:addActionEvent(spec.actionEvents, "VD_AI_HIGH_BEAM_ON", self, AdditionalInputsSpec.actionEventHighBeamOn, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_HIGH_BEAM_OFF_FLASH_TRIGGER", self, AdditionalInputsSpec.actionEventHighBeamOffTrigger, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_HIGH_BEAM_OFF_FLASH_RELEASE", self, AdditionalInputsSpec.actionEventHighBeamOffRelease, false, true, false, true, nil)
 
     -- implements
     local _, lowerFrontEventId = self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_FRONT", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
@@ -136,6 +140,12 @@ function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveF
     local _, activateBackEventId = self:addActionEvent(spec.actionEvents, "VD_AI_ACTIVATE_BACK", self, AdditionalInputsSpec.actionEventActivate, false, true, false, true, nil)
     g_inputBinding:setActionEventTextPriority(activateBackEventId, GS_PRIO_VERY_LOW)
 
+    for _, actionEvent in pairs(spec.actionEvents) do
+      if actionEvent.actionEventId ~= nil then
+        g_inputBinding:setActionEventTextVisibility(actionEvent.actionEventId, false)
+        g_inputBinding:setActionEventTextPriority(actionEvent.actionEventId, GS_PRIO_VERY_LOW)
+      end
+    end
   end
 
 end
@@ -208,14 +218,13 @@ function AdditionalInputsSpec:vdAISetTurnLightState(targetState)
   end
 end
 
-function AdditionalInputsSpec:actionEventFrontLightOn(actionName, inputValue, callbackState, isAnalog)
+function AdditionalInputsSpec:actionEventLowBeamOn(actionName, inputValue, callbackState, isAnalog)
   local sl = self.spec_lights
   if sl == nil then
     return
   end
   -- we can toggle the light and it is currently off
-  if self:getCanToggleLight() then
-    --and (bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT) == 0 or bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_WORK_FRONT) == 1) then
+  if self:getCanToggleLight() and (bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT) == 0 or bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_WORK_FRONT) ~= 0) then
     if sl.numLightTypes >= 1 then
       -- turn on frontLight
       local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT)
@@ -226,13 +235,13 @@ function AdditionalInputsSpec:actionEventFrontLightOn(actionName, inputValue, ca
   end
 end
 
-function AdditionalInputsSpec:actionEventFrontLightOff(actionName, inputValue, callbackState, isAnalog)
+function AdditionalInputsSpec:actionEventLowBeamOff(actionName, inputValue, callbackState, isAnalog)
   local sl = self.spec_lights
   if sl == nil then
     return
   end
   -- we can toggle the light and it is currently off
-  if self:getCanToggleLight() and bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT) == 1 then
+  if self:getCanToggleLight() and bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_DEFAULT) ~= 0 then
     if sl.numLightTypes >= 1 then
       -- turn of front light
       local newMask = bitAND(sl.lightsTypesMask, bitNOT(2 ^ Lights.LIGHT_TYPE_DEFAULT))
@@ -251,6 +260,63 @@ function AdditionalInputsSpec:actionEventFrontWorkLightOn(actionName, inputValue
     if sl.numLightTypes >= 1 then
       -- turn on front work lights
       local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_WORK_FRONT)
+      self:setLightsTypesMask(newMask)
+    end
+  end
+end
+
+function AdditionalInputsSpec:actionEventHighBeamOn(actionName, inputValue, callbackState, isAnalog)
+  self.spec_additionalInputs.debugger:trace("actionEventHighBeamOn")
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+  -- we can toggle the light and it is currently off
+  if self:getCanToggleLight() and bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_HIGHBEAM) == 0 then
+    if sl.numLightTypes >= 1 then
+      -- turn on high beams
+      local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_HIGHBEAM)
+      self:setLightsTypesMask(newMask)
+    end
+  end
+end
+
+function AdditionalInputsSpec:actionEventHighBeamOffTrigger(actionName, inputValue, callbackState, isAnalog)
+  self.spec_additionalInputs.debugger:trace("actionEventHighBeamOffTrigger")
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+  -- we can toggle the light and it is currently off
+  if self:getCanToggleLight() and sl.numLightTypes >= 1 then
+    if bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_HIGHBEAM) ~= 0 then
+      -- if high beams are on, we turn them off
+      -- turn off high beams
+      local newMask = bitAND(sl.lightsTypesMask, bitNOT(2 ^ Lights.LIGHT_TYPE_HIGHBEAM))
+      self.spec_additionalInputs.debugger:error("Turn off high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
+      self:setLightsTypesMask(newMask)
+    else
+      -- high beams are off, so this is a flash
+      -- turn on high beams
+      local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_HIGHBEAM)
+      self.spec_additionalInputs.debugger:error("Turn on high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
+      self:setLightsTypesMask(newMask)
+    end
+  end
+end
+
+function AdditionalInputsSpec:actionEventHighBeamOffRelease(actionName, inputValue, callbackState, isAnalog)
+  self.spec_additionalInputs.debugger:trace("actionEventHighBeamOffReleased")
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+  -- we can toggle the light and it is currently off
+  if self:getCanToggleLight() and bitAND(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_HIGHBEAM) ~= 0 then
+    if sl.numLightTypes >= 1 then
+      -- turn of front light
+      local newMask = bitAND(sl.lightsTypesMask, bitNOT(2 ^ Lights.LIGHT_TYPE_HIGHBEAM))
+      self.spec_additionalInputs.debugger:error("Turn off high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
       self:setLightsTypesMask(newMask)
     end
   end
