@@ -1,4 +1,4 @@
-~~# Additional Inputs
+# Additional Inputs
 
 Add additional inputs for multiple things, see [ActionEvents](#action-events) for the exact list.
 
