@@ -17,6 +17,7 @@ function AdditionalInputsSpec.registerEventListeners(vehicleType)
   SpecializationUtil.registerEventListener(vehicleType, "onLoad", AdditionalInputsSpec)
   SpecializationUtil.registerEventListener(vehicleType, "onEnterVehicle", AdditionalInputsSpec)
   SpecializationUtil.registerEventListener(vehicleType, "onLeaveVehicle", AdditionalInputsSpec)
+  SpecializationUtil.registerEventListener(vehicleType, "onUpdate", AdditionalInputsSpec)
   SpecializationUtil.registerEventListener(vehicleType, "onRegisterActionEvents", AdditionalInputsSpec)
 end
 
@@ -24,12 +25,18 @@ function AdditionalInputsSpec.registerFunctions(vehicleType)
   SpecializationUtil.registerFunction(vehicleType, "vdAIGetCenterNode", AdditionalInputsSpec.vdAIGetCenterNode)
   SpecializationUtil.registerFunction(vehicleType, "vdAIGetAttacherJointPosition", AdditionalInputsSpec.vdAIGetAttacherJointPosition)
   SpecializationUtil.registerFunction(vehicleType, "vdAIActionEvent", AdditionalInputsSpec.vdAIActionEvent)
+  SpecializationUtil.registerFunction(vehicleType, "vdAISetTurnLightState", AdditionalInputsSpec.vdAISetTurnLightState)
 end
 
 function AdditionalInputsSpec:onLoad(savegame)
   self.spec_additionalInputs = {
     debugger = GrisuDebug:create("AdditionalInputsSpec"),
-    actionEvents = {}
+    actionEvents = {},
+    -- indicator tip
+    indicatorTipActive = false,
+    indicatorTipDirection = nil, -- Lights.TURNLIGHT_LEFT or Lights.TURNLIGHT_RIGHT
+    indicatorTipTimer = 0,
+    indicatorTipDuration = 3000 -- 3 seconds in milliseconds
   }
   self.spec_additionalInputs.debugger:setLogLvl(g_additionalInputs.specLogLevel)
 end
@@ -57,6 +64,33 @@ function AdditionalInputsSpec:onLeaveVehicle(wasEntered)
   end
 end
 
+---Called on update
+---@param dt number time since last call in ms
+---@param isActiveForInput boolean true if vehicle is active for input
+---@param isSelected boolean true if vehicle is selected
+function AdditionalInputsSpec:onUpdate(dt, isActiveForInput, isActiveForInputIgnoreSelection, isSelected)
+  local spec = self.spec_additionalInputs
+
+  -- Handle indicator tip function
+  if spec.indicatorTipActive then
+    spec.indicatorTipTimer = spec.indicatorTipTimer + dt
+
+    -- If the tip duration has passed, turn the indicator off
+    if spec.indicatorTipTimer >= spec.indicatorTipDuration then
+      -- Turn off the indicator
+      self:vdAISetTurnLightState(Lights.TURNLIGHT_OFF)
+
+      -- Reset tip function state
+      spec.indicatorTipActive = false
+      spec.indicatorTipDirection = nil
+      spec.indicatorTipTimer = 0
+
+      spec.debugger:trace("Tip function completed, indicator turned off")
+    end
+  end
+
+end
+
 function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveForInputIgnoreSelection)
   if self.isClient then
     local spec = self.spec_additionalInputs
@@ -66,6 +100,15 @@ function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveF
       return
     end
 
+    -- indicators
+    local _, indicatorLeftOn = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_LEFT_ON", self, AdditionalInputsSpec.actionEventIndicatorOn, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(indicatorLeftOn, GS_PRIO_VERY_LOW)
+    local _, indicatorRightOn = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_RIGHT_ON", self, AdditionalInputsSpec.actionEventIndicatorOn, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(indicatorRightOn, GS_PRIO_VERY_LOW)
+    local _, indicatorOff = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_OFF", self, AdditionalInputsSpec.actionEventIndicatorOff, false, true, false, true, nil)
+    g_inputBinding:setActionEventTextPriority(indicatorOff, GS_PRIO_VERY_LOW)
+
+    -- implements
     local _, lowerFrontEventId = self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_FRONT", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
     g_inputBinding:setActionEventTextPriority(lowerFrontEventId, GS_PRIO_VERY_LOW)
 
@@ -86,6 +129,75 @@ function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveF
 
   end
 
+end
+
+function AdditionalInputsSpec:actionEventIndicatorOn(actionName, inputValue, callbackState, isAnalog)
+  local spec = self.spec_additionalInputs
+
+  local direction = nil
+  if actionName == "VD_AI_INDICATOR_LEFT_ON" then
+    direction = Lights.TURNLIGHT_LEFT
+  else
+    direction = Lights.TURNLIGHT_RIGHT
+  end
+
+  -- Store the direction and current time
+  spec.lastIndicatorOnDirection = direction
+  spec.lastIndicatorOnTime = g_time
+
+  -- Call the existing turn light function (assuming it exists)
+  if direction ~= nil then
+    self:vdAISetTurnLightState(direction)
+  end
+
+  spec.debugger:trace(function()
+    return "actionEventIndicatorOn: " .. tostring(direction)
+  end)
+
+end
+
+function AdditionalInputsSpec:actionEventIndicatorOff(actionName, inputValue, callbackState, isAnalog)
+  local spec = self.spec_additionalInputs
+
+  -- Check if indicator was turned on recently (within 300ms)
+  if spec.lastIndicatorOnTime ~= nil and g_time - spec.lastIndicatorOnTime < 500 then
+    -- Activate the tip function
+    spec.indicatorTipActive = true
+    spec.indicatorTipDirection = spec.lastIndicatorOnDirection
+    spec.indicatorTipTimer = 0
+
+    spec.debugger:trace(function()
+      return "Tip function activated for direction: " .. tostring(spec.indicatorTipDirection)
+    end)
+  else
+    -- Regular indicator off behavior
+    -- Call the existing turn light function (assuming it exists)
+    self:vdAISetTurnLightState(Lights.TURNLIGHT_OFF)
+
+    -- reset tip indicator variables
+    spec.indicatorTipActive = false
+    spec.indicatorTipDirection = nil
+    spec.indicatorTipTimer = 0
+  end
+
+  -- Reset the tracking variables
+  spec.lastIndicatorOnDirection = nil
+  spec.lastIndicatorOnTime = nil
+
+  spec.debugger:trace("actionEventIndicatorOff")
+end
+
+function AdditionalInputsSpec:vdAISetTurnLightState(targetState)
+  local sl = self.spec_lights
+  if sl == nil then
+    return
+  end
+
+  self.spec_additionalInputs.debugger:info("sl.turnLightState: " .. tostring(sl.turnLightState) .. ", target: " .. tostring(targetState))
+  if sl.turnLightState ~= targetState and sl.turnLightState ~= Lights.TURNLIGHT_HAZARD then
+    self.spec_additionalInputs.debugger:info("setTurn")
+    self:setTurnLightState(targetState)
+  end
 end
 
 function AdditionalInputsSpec:actionEventLower(actionName, inputValue, callbackState, isAnalog)

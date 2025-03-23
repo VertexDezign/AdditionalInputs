@@ -22,6 +22,14 @@
     </extraSourceFiles>
 
     <actions>
+        <!-- indicators -->
+        <action name="VD_AI_INDICATOR_LEFT_ON" category="VEHICLE"/>
+        <action name="VD_AI_INDICATOR_RIGHT_ON" category="VEHICLE"/>
+        <action name="VD_AI_INDICATOR_OFF" category="VEHICLE"/>
+        <!-- light -->
+        <action name="VD_AI_FRONT_LIGHT_ON" category="VEHICLE"/>
+        <action name="VD_AI_FRONT_LIGHT_OFF" category="VEHICLE"/>
+        <!-- implements -->
         <action name="VD_AI_LOWER_FRONT" category="VEHICLE"/>
         <action name="VD_AI_LOWER_BACK" category="VEHICLE"/>
         <action name="VD_AI_FOLD_FRONT" category="VEHICLE"/>
