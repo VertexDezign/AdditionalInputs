@@ -102,43 +102,26 @@ function AdditionalInputsSpec:onRegisterActionEvents(isActiveForInput, isActiveF
     end
 
     -- indicators
-    local _, indicatorLeftOn = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_LEFT_ON", self, AdditionalInputsSpec.actionEventIndicatorOn, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(indicatorLeftOn, GS_PRIO_VERY_LOW)
-    local _, indicatorRightOn = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_RIGHT_ON", self, AdditionalInputsSpec.actionEventIndicatorOn, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(indicatorRightOn, GS_PRIO_VERY_LOW)
-    local _, indicatorOff = self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_OFF", self, AdditionalInputsSpec.actionEventIndicatorOff, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(indicatorOff, GS_PRIO_VERY_LOW)
+    self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_LEFT_ON", self, AdditionalInputsSpec.actionEventIndicatorOn, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_RIGHT_ON", self, AdditionalInputsSpec.actionEventIndicatorOn, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_INDICATOR_OFF", self, AdditionalInputsSpec.actionEventIndicatorOff, false, true, false, true, nil)
 
     -- light
-    local _, lowBeamOn = self:addActionEvent(spec.actionEvents, "VD_AI_LOW_BEAM_ON", self, AdditionalInputsSpec.actionEventLowBeamOn, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(lowBeamOn, GS_PRIO_VERY_LOW)
-    local _, lowBeamOff = self:addActionEvent(spec.actionEvents, "VD_AI_LOW_BEAM_OFF", self, AdditionalInputsSpec.actionEventLowBeamOff, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(lowBeamOff, GS_PRIO_VERY_LOW)
-    local _, frontWorkLightOn = self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_WORK_LIGHT_ON", self, AdditionalInputsSpec.actionEventFrontWorkLightOn, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(frontWorkLightOn, GS_PRIO_VERY_LOW)
+    self:addActionEvent(spec.actionEvents, "VD_AI_LOW_BEAM_ON", self, AdditionalInputsSpec.actionEventLowBeamOn, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_LOW_BEAM_OFF", self, AdditionalInputsSpec.actionEventLowBeamOff, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_FRONT_WORK_LIGHT_ON", self, AdditionalInputsSpec.actionEventFrontWorkLightOn, false, true, false, true, nil)
 
     self:addActionEvent(spec.actionEvents, "VD_AI_HIGH_BEAM_ON", self, AdditionalInputsSpec.actionEventHighBeamOn, false, true, false, true, nil)
     self:addActionEvent(spec.actionEvents, "VD_AI_HIGH_BEAM_OFF_FLASH_TRIGGER", self, AdditionalInputsSpec.actionEventHighBeamOffTrigger, false, true, false, true, nil)
     self:addActionEvent(spec.actionEvents, "VD_AI_HIGH_BEAM_OFF_FLASH_RELEASE", self, AdditionalInputsSpec.actionEventHighBeamOffRelease, false, true, false, true, nil)
 
     -- implements
-    local _, lowerFrontEventId = self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_FRONT", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(lowerFrontEventId, GS_PRIO_VERY_LOW)
-
-    local _, lowerBackEventId = self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_BACK", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(lowerBackEventId, GS_PRIO_VERY_LOW)
-
-    local _, foldFrontEventId = self:addActionEvent(spec.actionEvents, "VD_AI_FOLD_FRONT", self, AdditionalInputsSpec.actionEventFold, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(foldFrontEventId, GS_PRIO_VERY_LOW)
-
-    local _, foldBackEventId = self:addActionEvent(spec.actionEvents, "VD_AI_FOLD_BACK", self, AdditionalInputsSpec.actionEventFold, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(foldBackEventId, GS_PRIO_VERY_LOW)
-
-    local _, activateFrontEventId = self:addActionEvent(spec.actionEvents, "VD_AI_ACTIVATE_FRONT", self, AdditionalInputsSpec.actionEventActivate, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(activateFrontEventId, GS_PRIO_VERY_LOW)
-
-    local _, activateBackEventId = self:addActionEvent(spec.actionEvents, "VD_AI_ACTIVATE_BACK", self, AdditionalInputsSpec.actionEventActivate, false, true, false, true, nil)
-    g_inputBinding:setActionEventTextPriority(activateBackEventId, GS_PRIO_VERY_LOW)
+    self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_FRONT", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_LOWER_BACK", self, AdditionalInputsSpec.actionEventLower, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_FOLD_FRONT", self, AdditionalInputsSpec.actionEventFold, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_FOLD_BACK", self, AdditionalInputsSpec.actionEventFold, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_ACTIVATE_FRONT", self, AdditionalInputsSpec.actionEventActivate, false, true, false, true, nil)
+    self:addActionEvent(spec.actionEvents, "VD_AI_ACTIVATE_BACK", self, AdditionalInputsSpec.actionEventActivate, false, true, false, true, nil)
 
     for _, actionEvent in pairs(spec.actionEvents) do
       if actionEvent.actionEventId ~= nil then
