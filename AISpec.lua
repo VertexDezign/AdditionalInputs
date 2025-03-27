@@ -38,7 +38,7 @@ function AdditionalInputsSpec:onLoad(savegame)
     indicatorTipTimer = 0,
     indicatorTipDuration = 3000 -- 3 seconds in milliseconds
   }
-  self.spec_additionalInputs.debugger:setLogLvl(g_additionalInputs.specLogLevel)
+  self.spec_additionalInputs.debugger:setLogLvl(g_vdAdditionalInputs.specLogLevel)
   self.spec_additionalInputs.debugger:trace("onLoad")
 end
 

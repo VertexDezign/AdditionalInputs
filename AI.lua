@@ -104,12 +104,15 @@ end
 
 local function installSpec(typeManager)
   if typeManager.typeName == "vehicle" then
-    g_additionalInputs:installSpec(typeManager)
+    g_vdAdditionalInputs:installSpec(typeManager)
   end
 end
 
 local function init()
-  g_additionalInputs = AdditionalInputs.init()
+  g_vdAdditionalInputs = AdditionalInputs.init()
+
+  -- make g_vdAdditionalInputs globally available
+  getmetatable(_G).__index.g_vdAdditionalInputs = g_vdAdditionalInputs
   -- install spec
   TypeManager.validateTypes = Utils.prependedFunction(TypeManager.validateTypes, installSpec)
 end
