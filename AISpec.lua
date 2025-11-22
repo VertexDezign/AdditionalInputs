@@ -49,8 +49,6 @@ function AdditionalInputsSpec:onEnterVehicle(isControlling)
       return "onEnterVehicle(" .. tostring(isControlling) .. ")"
     end)
 
-    --spec.debugger:tPrint("vehicle.self.spec_motorized", self.spec_motorized)
-
     g_gameGlass:setCurrentVehicle(self)
   end
 end

@@ -15,7 +15,7 @@ Works great with the [Moza Stalks](https://mozaracing.com/product/multi-function
 ### Lights
 
 Adds new controls for normal front light on and off, also one for worklight front on.
-The front light on action will also turn of the work light front. As this works best for me and the Moza Multi function
+The front light on action will also turn off the work light front. As this works best for me and the Moza Multi function
 stalks. Translation from Moza Stalk lever turn thingi to FS25
 
 * OFF -> Front lights OFF
