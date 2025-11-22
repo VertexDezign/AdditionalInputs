@@ -90,7 +90,7 @@ function AdditionalInputs:installSpec(typeManager)
     totalCount = totalCount + 1
     if SpecializationUtil.hasSpecialization(Enterable, typeEntry.specializations) and
         not SpecializationUtil.hasSpecialization(Rideable, typeEntry.specializations) and
-        not SpecializationUtil.hasSpecialization(ParkVehicle, typeEntry.specializations) then
+        not SpecializationUtil.hasSpecialization(AdditionalInputsSpec, typeEntry.specializations) then
       typeManager:addSpecialization(typeName, modName .. ".AdditionalInputsSpec")
       modified = modified + 1
       self.debugger:trace("Adding AdditionalInputs spec to " .. typeName)
