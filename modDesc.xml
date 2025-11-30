@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="96">
+<modDesc descVersion="104">
     <author>VertexDezign</author>
     <version>0.1.0.0</version>
     <title>
@@ -20,6 +20,7 @@ Indicators / TurnSignal
 Adds explicit inputs for indicating left / right and one for turning them off. Similar how an indicator lever in a car
 works. Also adds the tip blink / comfort indicators functionality. If after the on signal an off signals follows within
 500ms, the tip blink is activated.
+If the hazard light is on, it has priority. These added inputs cannot turn of the hazard lights.
 
 
 Lights
@@ -49,7 +50,45 @@ GitHub link: https://github.com/VertexDezign/AdditionalInputs
 ]]>
         </en>
         <de><![CDATA[
+Zusätzliche Eingaben verbessern die Fahrzeugsteuerung in FS25 durch explizite Tastaturbelegungen, die für realistische Hardware-Setups wie die Moza-Multifunktionshebel entwickelt wurden.
+Dieser Mod bietet eine authentische Blinkerlogik mit Komfortblinken,
+diskrete Steuerungen für Scheinwerfer- und Arbeitsscheinwerferstufen sowie dedizierte Eingaben zum Einklappen, Absenken und Aktivieren von Anbaugeräten,
+unabhängig von ihrer vorderen oder hinteren Position, ohne dass diese zuvor ausgewählt werden müssen.
 
+Funktionen
+
+Blinker
+
+Fügt explizite Eingaben für das Blinken von links/rechts und eine zum Ausschalten hinzu. Ähnlich wie ein Blinkerhebel in einem Auto
+funktioniert. Fügt außerdem die Funktion „Tip Blink“ / Komfortblinken hinzu. Wenn nach dem Einschaltsignal innerhalb von
+500 ms ein Ausschaltsignal folgt, wird „Tip Blink“ aktiviert.
+Falls die Warnblinkanalge eingeschaltet ist, hat diese Vorrang und wird nicht ausgeschaltet über diese neuen Eingaben.
+
+
+Belechtung
+
+Fügt neue Steuerungen für das normale Ein- und Ausschalten des Frontlichts sowie eine für das Einschalten des Arbeitslichts vorne hinzu.
+Durch das Einschalten des Frontlichts wird auch das Arbeitslicht vorne ausgeschaltet. Dies funktioniert für mich und die Moza-Multifunktionshebel am besten.
+Übersetzung von Moza-Hebelbewegung zu FS25
+
+* AUS -> Frontscheinwerfer AUS
+* Standlicht -> Frontscheinwerfer EIN
+* Frontscheinwerfer -> Front-Arbeitsscheinwerfer EIN
+
+Fügt außerdem drei zusätzliche Eingänge für das Fernlicht hinzu. Einen zum Einschalten des Fernlichts, einen zum Auslösen der Lichthupe
+(und zum Ausschalten des zuvor eingeschalteten Fernlichts) und einen zum Beenden der Lichthupe.
+
+
+Anbaugeräte
+
+Fügen Sie die Eingaben „Ausklappen“, „Heben/Senken“ und „Aktivieren“ für vorne oder hinten angebrachte Werkzeuge hinzu. Diese sind nicht an den
+aktuell ausgewählten Teil des Fahrzeugs gebunden.
+
+Weitere Informationen zur Einrichtung mit Moza Stalks finden Sie auf Github.
+Dort finden Sie auch eine detaillierte Tabelle, in der jede Eingabe ausführlich beschrieben wird.
+Bitte melden Sie Feedback oder Probleme auf Github.
+
+GitHub-Link: https://github.com/VertexDezign/AdditionalInputs
 ]]>
         </de>
     </description>
@@ -59,6 +98,8 @@ GitHub link: https://github.com/VertexDezign/AdditionalInputs
         <sourceFile filename="GrisuDebug.lua"/>
         <sourceFile filename="AI.lua"/>
     </extraSourceFiles>
+
+    <l10n filenamePrefix="l10n/l10n"/>
 
     <actions>
         <!-- indicators -->

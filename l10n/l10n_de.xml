@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <texts>
+        <text name="input_VD_AI_INDICATOR_LEFT_ON" text="Blinker links an"/>
+        <text name="input_VD_AI_INDICATOR_RIGHT_ON" text="Blinker rechts an"/>
+        <text name="input_VD_AI_INDICATOR_OFF" text="Blinker aus"/>
+
+        <text name="input_VD_AI_LOW_BEAM_ON" text="Frontlicht an"/>
+        <text name="input_VD_AI_LOW_BEAM_OFF" text="Frontlicht aus"/>
+        <text name="input_VD_AI_FRONT_WORK_LIGHT_ON" text="Arbeitschlicht vorne an"/>
+        <text name="input_VD_AI_HIGH_BEAM_ON" text="Fernlicht an"/>
+        <text name="input_VD_AI_HIGH_BEAM_OFF_FLASH_TRIGGER" text="Lichthupe an"/>
+        <text name="input_VD_AI_HIGH_BEAM_OFF_FLASH_RELEASE" text="Lichthupe aus"/>
+
+        <text name="input_VD_AI_LOWER_FRONT" text="Senken vorderer Geräte"/>
+        <text name="input_VD_AI_LOWER_BACK" text="Senken hinterer Geräte"/>
+        <text name="input_VD_AI_FOLD_FRONT" text="Ausklappen vorderer Geräte"/>
+        <text name="input_VD_AI_FOLD_BACK" text="Ausklappen hinterer Geräte"/>
+        <text name="input_VD_AI_ACTIVATE_FRONT" text="Einschalten vorderer Geräte"/>
+        <text name="input_VD_AI_ACTIVATE_BACK" text="Einschalten hinterer Geräte"/>
+    </texts>
+</l10n>

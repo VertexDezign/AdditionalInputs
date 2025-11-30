@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<l10n>
+    <texts>
+        <text name="input_VD_AI_INDICATOR_LEFT_ON" text="Indicator left on"/>
+        <text name="input_VD_AI_INDICATOR_RIGHT_ON" text="Indicator right on"/>
+        <text name="input_VD_AI_INDICATOR_OFF" text="Indicator off"/>
+
+        <text name="input_VD_AI_LOW_BEAM_ON" text="LowBeam on"/>
+        <text name="input_VD_AI_LOW_BEAM_OFF" text="LowBeam off"/>
+        <text name="input_VD_AI_FRONT_WORK_LIGHT_ON" text="Worklight front on"/>
+        <text name="input_VD_AI_HIGH_BEAM_ON" text="HighBeam on"/>
+        <text name="input_VD_AI_HIGH_BEAM_OFF_FLASH_TRIGGER" text="HighBeam flash on"/>
+        <text name="input_VD_AI_HIGH_BEAM_OFF_FLASH_RELEASE" text="HighBeam flash off"/>
+
+        <text name="input_VD_AI_LOWER_FRONT" text="Lower front implements"/>
+        <text name="input_VD_AI_LOWER_BACK" text="Lower back implements"/>
+        <text name="input_VD_AI_FOLD_FRONT" text="Fold front implements"/>
+        <text name="input_VD_AI_FOLD_BACK" text="Fold back implements"/>
+        <text name="input_VD_AI_ACTIVATE_FRONT" text="Activate front implements"/>
+        <text name="input_VD_AI_ACTIVATE_BACK" text="Activate back implements"/>
+    </texts>
+</l10n>
