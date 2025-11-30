@@ -123,23 +123,23 @@ GitHub-Link: https://github.com/VertexDezign/AdditionalInputs
     </actions>
 
     <inputBinding>
-        <actionBinding action="GG_AI_LOWER_FRONT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_v"/>
+        <actionBinding action="VD_AI_LOWER_FRONT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lctrl KEY_v"/>
         </actionBinding>
-        <actionBinding action="GG_AI_LOWER_BACK">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_v"/>
+        <actionBinding action="VD_AI_LOWER_BACK">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_lctrl KEY_v"/>
         </actionBinding>
-        <actionBinding action="GG_AI_FOLD_FRONT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_x"/>
+        <actionBinding action="VD_AI_FOLD_FRONT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lctrl KEY_x"/>
         </actionBinding>
-        <actionBinding action="GG_AI_FOLD_BACK">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_x"/>
+        <actionBinding action="VD_AI_FOLD_BACK">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_lctrl KEY_x"/>
         </actionBinding>
-        <actionBinding action="GG_AI_ACTIVATE_FRONT">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_b"/>
+        <actionBinding action="VD_AI_ACTIVATE_FRONT">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lshift KEY_lctrl KEY_b"/>
         </actionBinding>
-        <actionBinding action="GG_AI_ACTIVATE_BACK">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_b"/>
+        <actionBinding action="VD_AI_ACTIVATE_BACK">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_lalt KEY_lctrl KEY_b"/>
         </actionBinding>
     </inputBinding>
 
