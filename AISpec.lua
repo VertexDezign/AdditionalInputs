@@ -274,13 +274,13 @@ function AdditionalInputsSpec:actionEventHighBeamOffTrigger(actionName, inputVal
       -- if high beams are on, we turn them off
       -- turn off high beams
       local newMask = bitAND(sl.lightsTypesMask, bitNOT(2 ^ Lights.LIGHT_TYPE_HIGHBEAM))
-      self.spec_additionalInputs.debugger:error("Turn off high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
+      self.spec_additionalInputs.debugger:trace("Turn off high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
       self:setLightsTypesMask(newMask)
     else
       -- high beams are off, so this is a flash
       -- turn on high beams
       local newMask = bitOR(sl.lightsTypesMask, 2 ^ Lights.LIGHT_TYPE_HIGHBEAM)
-      self.spec_additionalInputs.debugger:error("Turn on high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
+      self.spec_additionalInputs.debugger:trace("Turn on high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
       self:setLightsTypesMask(newMask)
     end
   end
@@ -297,7 +297,7 @@ function AdditionalInputsSpec:actionEventHighBeamOffRelease(actionName, inputVal
     if sl.numLightTypes >= 1 then
       -- turn of front light
       local newMask = bitAND(sl.lightsTypesMask, bitNOT(2 ^ Lights.LIGHT_TYPE_HIGHBEAM))
-      self.spec_additionalInputs.debugger:error("Turn off high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
+      self.spec_additionalInputs.debugger:trace("Turn off high beams, newMask: " .. tostring(newMask) .. " old: " .. tostring(sl.lightsTypesMask))
       self:setLightsTypesMask(newMask)
     end
   end
