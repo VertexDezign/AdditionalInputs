@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="104">
     <author>VertexDezign</author>
-    <version>1.0.0.0</version>
+    <version>1.1.0.0</version>
     <title>
         <en>Additional Inputs</en>
         <de>Zusätzliche Eingaben</de>
@@ -47,6 +47,10 @@ There you also find a detailed Table describing each input in detail.
 Please report feedback or issues on Github.
 
 GitHub link: https://github.com/VertexDezign/AdditionalInputs
+
+Changelog:
+1.1.0.0:
+* Support renamed vdTelemetry Mod
 ]]>
         </en>
         <de><![CDATA[
@@ -89,6 +93,9 @@ Dort finden Sie auch eine detaillierte Tabelle, in der jede Eingabe ausführlich
 Bitte melden Sie Feedback oder Probleme auf Github.
 
 GitHub-Link: https://github.com/VertexDezign/AdditionalInputs
+
+Changelog:
+* Unterstützung für den umbenannten vdTelemetry mod
 ]]>
         </de>
     </description>

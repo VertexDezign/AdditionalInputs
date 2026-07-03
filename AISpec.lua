@@ -43,23 +43,23 @@ function AdditionalInputsSpec:onLoad(savegame)
 end
 
 function AdditionalInputsSpec:onEnterVehicle(isControlling)
-  if g_gameGlass ~= nil then
+  if g_vdTelemetry ~= nil then
     local spec = self.spec_additionalInputs
     spec.debugger:trace(function()
       return "onEnterVehicle(" .. tostring(isControlling) .. ")"
     end)
 
-    g_gameGlass:setCurrentVehicle(self)
+    g_vdTelemetry:setCurrentVehicle(self)
   end
 end
 
 function AdditionalInputsSpec:onLeaveVehicle(wasEntered)
-  if g_gameGlass ~= nil then
+  if g_vdTelemetry ~= nil then
     local spec = self.spec_additionalInputs
     spec.debugger:trace(function()
       return "onLeaveVehicle(" .. tostring(wasEntered) .. ")"
     end)
-    g_gameGlass:clearCurrentVehicle()
+    g_vdTelemetry:clearCurrentVehicle()
   end
 end
 

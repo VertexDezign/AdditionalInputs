@@ -2,6 +2,7 @@
 --
 -- @author  Grisu118 - VertexDezign.net
 -- @history     v1.0.0.0 - 2025-03-23 - Initial implementation
+--              v1.1.0.0 - 2026-07-03 - Rename vd telemetry
 -- @Descripion: Registers additional input bindings
 -- @web: https://grisu118.ch or https://vertexdezign.net
 -- Copyright (C) Grisu118, All Rights Reserved.
@@ -13,10 +14,10 @@ local modName = g_currentModName
 ---@field debugger GrisuDebug
 ---@field settingsXmlFile string
 AdditionalInputs = {}
--- Increase this if breaking changes requires an update of GameGlass
+-- Increase this if breaking changes requires an update of VDTelemetry
 AdditionalInputs.MAJOR_VERSION = 1
 -- Increase this if a new feature is added and a depending mod requires it
-AdditionalInputs.MINOR_VERSION = 0
+AdditionalInputs.MINOR_VERSION = 1
 AdditionalInputs.SETTINGS_XML = "additionalInputsSettings.xml"
 AdditionalInputs.SETTINGS_XML_VERSION = 1
 
