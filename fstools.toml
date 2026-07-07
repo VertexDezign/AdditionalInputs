@@ -1,0 +1,8 @@
+[mod]
+zip_name = "FS25_additionalInputs"
+version = "1.1.0.0"
+author = "VertexDezign"
+
+[mod.title]
+en = "Additional Inputs"
+de = "Zusätzliche Eingaben"

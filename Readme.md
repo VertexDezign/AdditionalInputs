@@ -94,3 +94,27 @@ The replace these bindings in your ``inputBinding.xml``
     </actionBinding>
 </inputBinding>
 ````
+
+## Development
+
+This mod is packaged with [FSTools](https://github.com/VertexDezign/FSTools), our command-line utility for FS25
+modding. Packaging is configured via [`fstools.toml`](fstools.toml) (zip name, version, author).
+
+Install FSTools (requires [`uv`](https://docs.astral.sh/uv/)):
+
+```sh
+uv tool install --editable .   # run from a checkout of the FSTools repo; installs the `fs` executable
+```
+
+Common commands (run from this project's root):
+
+```sh
+fs pack        # build FS25_additionalInputs.zip
+fs pack -d     # build and deploy to the FS25 mods folder
+fs pack -p     # build, deploy, and launch FS25
+fs validate    # validate modDesc.xml
+fs log         # follow the game log live
+```
+
+Set `FS25_MODS_DIR` / `FS25_GAME_DIR` if your FS25 install is not auto-detected. See the FSTools README for the
+full command and environment-variable reference.
