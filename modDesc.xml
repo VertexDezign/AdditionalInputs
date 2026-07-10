@@ -51,6 +51,7 @@ GitHub link: https://github.com/VertexDezign/AdditionalInputs
 Changelog:
 1.1.0.0:
 * Support renamed vdTelemetry Mod
+* Add public API, which allows other mods to execute actions
 ]]>
         </en>
         <de><![CDATA[
@@ -95,7 +96,9 @@ Bitte melden Sie Feedback oder Probleme auf Github.
 GitHub-Link: https://github.com/VertexDezign/AdditionalInputs
 
 Changelog:
+1.1.0.0:
 * Unterstützung für den umbenannten vdTelemetry mod
+* API hinzugefügt, welche es anderen Mods erlaubt Aktionen auszuführen
 ]]>
         </de>
     </description>

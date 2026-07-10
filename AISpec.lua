@@ -344,21 +344,39 @@ end
 
 ---Toggle (or set) the folding state of a single object. Caller must ensure object.spec_foldable ~= nil.
 ---@param object table the vehicle or implement to act on
----@param targetState boolean|nil when set, forces this state instead of toggling
----@return boolean|nil newState the applied state, or nil if nothing was changed
+---@param targetState boolean|nil true folds, false unfolds; nil toggles
+---@return boolean|nil newState the requested folded state, or nil if nothing was changed
 local function foldObject(object, targetState, isPowered, powerWarning, debugger)
   local fSpec = object.spec_foldable
   if #fSpec.foldingParts > 0 then
-    local direction = object:getToggledFoldDirection()
+    -- turnOnFoldDirection leads to the turn-on-able state, which requires the machine unfolded.
+    local unfoldDirection = fSpec.turnOnFoldDirection
+
+    -- Where the machine comes to rest: while an animation runs, the committed move direction is
+    -- what it will end up as, so a command reversing an in-flight fold is not read as a no-op.
+    local isFolded
+    if fSpec.foldMoveDirection ~= 0 then
+      isFolded = fSpec.foldMoveDirection ~= unfoldDirection
+    else
+      isFolded = not object:getIsUnfolded()
+    end
+
+    local newState = targetState
+    if newState == nil then
+      newState = not isFolded
+    elseif newState == isFolded then
+      -- already where it was asked to be; return the state so child implements still get the command
+      debugger:trace("Fold already in requested state: %s", tostring(newState))
+      return newState
+    end
+
+    local direction = newState and -unfoldDirection or unfoldDirection
     local allowed, warning = object:getIsFoldAllowed(direction, false)
     local requiresPower = fSpec.requiresPower
-    local newState = targetState
 
     if allowed and (not requiresPower or isPowered) then
-      if newState == nil then
-        newState = direction == fSpec.turnOnFoldDirection
-      end
-      if newState then
+      debugger:trace("Folding is allowed, newState: %s, direction: %s", tostring(newState), tostring(direction))
+      if not newState then
         object:setFoldState(direction, true)
       else
         object:setFoldState(direction, false)
@@ -369,7 +387,7 @@ local function foldObject(object, targetState, isPowered, powerWarning, debugger
 
           if attacherJointIndex ~= nil then
             local moveDown = attacherVehicle:getJointMoveDown(attacherJointIndex)
-            local targetMoveDown = direction == fSpec.turnOnFoldDirection
+            local targetMoveDown = direction == unfoldDirection
 
             if targetMoveDown ~= moveDown then
               attacherVehicle:setJointMoveDown(attacherJointIndex, targetMoveDown)
@@ -419,7 +437,7 @@ end
 ---Toggle (or set) the folding state of all implements attached at the given position.
 ---@param vehicle table
 ---@param position AttacherJointPosition
----@param forceState boolean|nil when set, forces this state instead of toggling
+---@param forceState boolean|nil true folds, false unfolds; nil toggles
 local function doFold(vehicle, position, forceState)
   local debugger = vehicle.spec_additionalInputs.debugger
   debugger:trace("doFold called with position: %s, forceState: %s", position, tostring(forceState))
@@ -460,13 +478,13 @@ function AdditionalInputsSpec:vdAILowerBack(forceState)
 end
 
 ---Toggle or set the folding state of all implements attached at the front.
----@param forceState boolean|nil when set, forces this state instead of toggling
+---@param forceState boolean|nil true folds, false unfolds; nil toggles
 function AdditionalInputsSpec:vdAIFoldFront(forceState)
   doFold(self, "FRONT", forceState)
 end
 
 ---Toggle or set the folding state of all implements attached at the back.
----@param forceState boolean|nil when set, forces this state instead of toggling
+---@param forceState boolean|nil true folds, false unfolds; nil toggles
 function AdditionalInputsSpec:vdAIFoldBack(forceState)
   doFold(self, "BACK", forceState)
 end
@@ -532,7 +550,7 @@ function AdditionalInputsSpec:vdAILowerVehicle(forceState)
 end
 
 ---Toggle or set the folding state of the vehicle itself. No-op if the vehicle is not foldable.
----@param forceState boolean|nil when set, forces this state instead of toggling
+---@param forceState boolean|nil true folds, false unfolds; nil toggles
 function AdditionalInputsSpec:vdAIFoldVehicle(forceState)
   local debugger = self.spec_additionalInputs.debugger
   debugger:trace("vdAIFoldVehicle called with forceState: %s", tostring(forceState))
