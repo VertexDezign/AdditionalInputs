@@ -59,11 +59,10 @@ jobs:
           echo "publish=true" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-          # FS25's modDesc version is four numbers and can express nothing else, so only the
-          # numeric head of the tag is compared (a -alpha.1 suffix, if used, is ours alone).
-          numeric="${version%%-*}"
-          if [ "$(echo "$moddesc_version" | cut -d. -f1-3)" != "$(echo "$numeric" | cut -d. -f1-3)" ]; then
-            echo "::error::modDesc.xml says $moddesc_version, tag says $numeric"; exit 1
+          # modDesc.xml carries the whole version -- all four components and any suffix -- so the
+          # tag must match it exactly, not just a numeric head or a three-component prefix.
+          if [ "$moddesc_version" != "$version" ]; then
+            echo "::error::modDesc.xml says $moddesc_version, tag says $version"; exit 1
           fi
 
   mod:
