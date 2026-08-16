@@ -26,7 +26,7 @@ jobs:
       publish: ${{ steps.v.outputs.publish }}
     steps:
       # Build-only checkout pushes nothing back, so the token stays out of .git.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -76,12 +76,12 @@ jobs:
       # quietly change what ships from here; bump it deliberately and re-run the dry run.
       FSTOOLS: git+https://github.com/VertexDezign/FSTools@v0.1.0
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
 
       # Every Lua file the mod loads must actually be in the tree. GrisuDebug.lua and AI.lua come
       # from modDesc's <extraSourceFiles>; the spec is registered at runtime via Utils.getFilename
@@ -140,7 +140,7 @@ jobs:
           sys.exit(1 if bad else 0)
           EOF
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: mod
           path: dist/
@@ -156,11 +156,11 @@ jobs:
       contents: write
     steps:
       # Only so `gh` can read the repo off the remote; it authenticates with GH_TOKEN below.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: mod
           path: dist
