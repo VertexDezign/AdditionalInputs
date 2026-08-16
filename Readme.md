@@ -94,3 +94,56 @@ The replace these bindings in your ``inputBinding.xml``
     </actionBinding>
 </inputBinding>
 ````
+
+## Scripting API
+
+The implement actions are also exposed as functions on the vehicle, so other mods can trigger them directly
+(they are added to every enterable, non-rideable vehicle type). Each takes an optional `forceState`: omit it to
+toggle, or pass `true` / `false` to force a specific state.
+
+| Function                             | Description                                                               |
+|--------------------------------------|---------------------------------------------------------------------------|
+| `vehicle:vdAILowerFront(state)`      | Lower/raise all implements attached at the front                          |
+| `vehicle:vdAILowerBack(state)`       | Lower/raise all implements attached at the back                           |
+| `vehicle:vdAIFoldFront(state)`       | Fold/unfold all implements attached at the front                          |
+| `vehicle:vdAIFoldBack(state)`        | Fold/unfold all implements attached at the back                           |
+| `vehicle:vdAIActivateFront(state)`   | Turn on/off all implements attached at the front                          |
+| `vehicle:vdAIActivateBack(state)`    | Turn on/off all implements attached at the back                           |
+| `vehicle:vdAILowerVehicle(state)`    | Lower/raise the vehicle itself (pickup, fold‑middle or attacher lowering) |
+| `vehicle:vdAIFoldVehicle(state)`     | Fold/unfold the vehicle itself                                            |
+| `vehicle:vdAIActivateVehicle(state)` | Turn on/off the vehicle itself                                            |
+
+```lua
+-- toggle the front implements' lowered state
+vehicle:vdAILowerFront()
+-- explicitly lower the vehicle's own working tool (e.g. self-propelled mower / baler pickup)
+vehicle:vdAILowerVehicle(true)
+```
+
+The `*Vehicle` variants act on the controlled vehicle itself and pick the correct mechanism automatically: an
+integrated pickup (baler, forage wagon), the foldable *fold middle* position (self-propelled mower), or classic
+attacher-joint lowering. Each function is a no-op if the vehicle does not support the corresponding action.
+
+## Development
+
+This mod is packaged with [FSTools](https://github.com/VertexDezign/FSTools), our command-line utility for FS25
+modding. Packaging is configured via [`fstools.toml`](fstools.toml) (zip name, version, author).
+
+Install FSTools (requires [`uv`](https://docs.astral.sh/uv/)):
+
+```sh
+uv tool install --editable .   # run from a checkout of the FSTools repo; installs the `fs` executable
+```
+
+Common commands (run from this project's root):
+
+```sh
+fs pack        # build FS25_additionalInputs.zip
+fs pack -d     # build and deploy to the FS25 mods folder
+fs pack -p     # build, deploy, and launch FS25
+fs validate    # validate modDesc.xml
+fs log         # follow the game log live
+```
+
+Set `FS25_MODS_DIR` / `FS25_GAME_DIR` if your FS25 install is not auto-detected. See the FSTools README for the
+full command and environment-variable reference.
