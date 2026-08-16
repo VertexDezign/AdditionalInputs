@@ -1,0 +1,25 @@
+# Dependabot version updates.
+version: 2
+
+updates:
+  # --- GitHub Actions -------------------------------------------------------
+  # `/` is not a guess: for this ecosystem the directory is always the repo
+  # root, and Dependabot finds every workflow under .github/workflows itself.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Zurich
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "⬆️ [ci] "
+    groups:
+      # One PR for all of them, majors included. The workflows pin actions to a
+      # major tag (`actions/checkout@v7`), so *every* update Dependabot can
+      # offer here is a major bump — splitting majors out, as the Gradle block
+      # does, would leave the group permanently empty.
+      actions:
+        patterns:
+          - "*"

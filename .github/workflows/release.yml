@@ -1,0 +1,178 @@
+name: Release
+
+# Tag-driven: `git tag v1.1.0 && git push --tags` builds the mod zip and publishes a GitHub
+# release carrying it. `workflow_dispatch` builds and verifies the same zip without publishing,
+# so the packaging can be exercised before a tag is spent on it.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+# A release must never be cancelled halfway through by a second push.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+# Read by default; only `publish` writes anything, and it grants itself the token it needs.
+permissions:
+  contents: read
+
+jobs:
+  version:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+      publish: ${{ steps.v.outputs.publish }}
+    steps:
+      # Build-only checkout pushes nothing back, so the token stays out of .git.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # The tag is the single source of truth for what is being released, and modDesc.xml -- the
+      # version the packed zip actually carries -- has to agree with it. The release stops here if
+      # it doesn't: a mod whose modDesc version disagrees with its download is not something to
+      # find out about after publishing.
+      - name: Resolve and verify version
+        id: v
+        run: |
+          set -euo pipefail
+
+          # fstools.toml sets no `version`, so `fs pack` ships modDesc.xml's <version> untouched.
+          # That value is the one thing the tag is checked against.
+          moddesc_version=$(grep -oPm1 '<version>\K[^<]+' modDesc.xml || true)
+          if [ -z "$moddesc_version" ]; then
+            echo "::error::no <version> found in modDesc.xml"; exit 1
+          fi
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # The checked-in version with a dev suffix, so a dry run exercises the real shape.
+            version="${moddesc_version}-dev.${{ github.run_number }}"
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "version=$version" >> "$GITHUB_OUTPUT"
+            echo "Dry run: $version (nothing will be published)"
+            exit 0
+          fi
+
+          version="${GITHUB_REF_NAME#v}"
+          echo "publish=true" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          # modDesc.xml carries the whole version -- all four components and any suffix -- so the
+          # tag must match it exactly, not just a numeric head or a three-component prefix.
+          if [ "$moddesc_version" != "$version" ]; then
+            echo "::error::modDesc.xml says $moddesc_version, tag says $version"; exit 1
+          fi
+
+  mod:
+    name: Mod zip
+    needs: version
+    runs-on: ubuntu-latest
+    env:
+      # The same `fs pack` used locally, so the released zip and the one on the developer's
+      # machine come out of one definition of "what is the mod" instead of CI keeping a second
+      # list that silently drifts. Pinned to a release, not a branch, so nothing over there can
+      # quietly change what ships from here; bump it deliberately and re-run the dry run.
+      FSTOOLS: git+https://github.com/VertexDezign/FSTools@v0.1.0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+
+      # Every Lua file the mod loads must actually be in the tree. GrisuDebug.lua and AI.lua come
+      # from modDesc's <extraSourceFiles>; the spec is registered at runtime via Utils.getFilename
+      # in AI.lua and is invisible to modDesc, so it is gathered from there too. A typo here is a
+      # mod that loads halfway and then errors in someone's savegame, which no test covers.
+      - name: Verify sourced files exist
+        run: |
+          set -euo pipefail
+          fail=0
+          extra=$(grep -oP '<sourceFile filename="\K[^"]+' modDesc.xml || true)
+          runtime=$(grep -oP 'Utils\.getFilename\("\K[^"]+\.lua' AI.lua || true)
+          for f in $extra $runtime; do
+            [ -f "$f" ] || { echo "::error::sourced file not found: $f"; fail=1; }
+          done
+          exit $fail
+
+      - name: Validate modDesc.xml
+        run: uvx --from "$FSTOOLS" fs validate
+
+      # `fs pack` rewrites title into the packed modDesc.xml from fstools.toml, but deliberately
+      # not the version -- so the modDesc checked against the tag above is the one the zip carries.
+      - name: Build FS25_additionalInputs.zip
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          uvx --from "$FSTOOLS" fs pack -o "$GITHUB_WORKSPACE/dist"
+
+      # Independent of whatever packed it: the zip is opened and asked whether it is a working mod.
+      # `fs pack`'s excludes are a deny list, so the failure mode they cannot catch is a *new*
+      # repo-only file quietly shipping to players -- checked here explicitly.
+      - name: Verify the packed zip
+        run: |
+          set -euo pipefail
+          python3 - <<'EOF'
+          import re, sys, zipfile, pathlib
+          names = set(zipfile.ZipFile("dist/FS25_additionalInputs.zip").namelist())
+          bad = []
+
+          if "modDesc.xml" not in names:
+              bad.append("modDesc.xml is not at the zip root")
+
+          leaked = sorted(n for n in names
+                          if n.endswith((".md", ".toml"))
+                          or n.startswith(".github/"))
+          bad += [f"repo-only file shipped: {n}" for n in leaked]
+
+          moddesc = pathlib.Path("modDesc.xml").read_text()
+          ai = pathlib.Path("AI.lua").read_text()
+          sourced = re.findall(r'<sourceFile filename="([^"]+)"', moddesc)
+          sourced += re.findall(r'Utils\.getFilename\("([^"]+\.lua)"', ai)
+          bad += [f"sourced file missing from zip: {s}" for s in sourced if s not in names]
+
+          for b in bad:
+              print(f"::error::{b}")
+          print(f"{len(names)} files, {len(sourced)} sourced modules, {len(bad)} problem(s)")
+          sys.exit(1 if bad else 0)
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mod
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish release
+    needs: [version, mod]
+    if: needs.version.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    # The only job that writes anything back, and the only one granted it.
+    permissions:
+      contents: write
+    steps:
+      # Only so `gh` can read the repo off the remote; it authenticates with GH_TOKEN below.
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: mod
+          path: dist
+
+      - name: List assets
+        run: ls -lh dist/
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.version.outputs.version }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "Additional Inputs $VERSION" \
+            --generate-notes
