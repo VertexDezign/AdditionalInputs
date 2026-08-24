@@ -101,17 +101,20 @@ The implement actions are also exposed as functions on the vehicle, so other mod
 (they are added to every enterable, non-rideable vehicle type). Each takes an optional `forceState`: omit it to
 toggle, or pass `true` / `false` to force a specific state.
 
-| Function                             | Description                                                               |
-|--------------------------------------|---------------------------------------------------------------------------|
-| `vehicle:vdAILowerFront(state)`      | Lower/raise all implements attached at the front                          |
-| `vehicle:vdAILowerBack(state)`       | Lower/raise all implements attached at the back                           |
-| `vehicle:vdAIFoldFront(state)`       | Fold/unfold all implements attached at the front                          |
-| `vehicle:vdAIFoldBack(state)`        | Fold/unfold all implements attached at the back                           |
-| `vehicle:vdAIActivateFront(state)`   | Turn on/off all implements attached at the front                          |
-| `vehicle:vdAIActivateBack(state)`    | Turn on/off all implements attached at the back                           |
-| `vehicle:vdAILowerVehicle(state)`    | Lower/raise the vehicle itself (pickup, fold‑middle or attacher lowering) |
-| `vehicle:vdAIFoldVehicle(state)`     | Fold/unfold the vehicle itself                                            |
-| `vehicle:vdAIActivateVehicle(state)` | Turn on/off the vehicle itself                                            |
+| Function                              | Description                                                               |
+|---------------------------------------|---------------------------------------------------------------------------|
+| `vehicle:vdAILowerFront(state)`       | Lower/raise all implements attached at the front                          |
+| `vehicle:vdAILowerBack(state)`        | Lower/raise all implements attached at the back                           |
+| `vehicle:vdAIFoldFront(state)`        | Fold/unfold all implements attached at the front                          |
+| `vehicle:vdAIFoldBack(state)`         | Fold/unfold all implements attached at the back                           |
+| `vehicle:vdAIActivateFront(state)`    | Turn on/off all implements attached at the front                          |
+| `vehicle:vdAIActivateBack(state)`     | Turn on/off all implements attached at the back                           |
+| `vehicle:vdAILowerVehicle(state)`     | Lower/raise the vehicle itself (pickup, fold‑middle or attacher lowering) |
+| `vehicle:vdAIFoldVehicle(state)`      | Fold/unfold the vehicle itself                                            |
+| `vehicle:vdAIActivateVehicle(state)`  | Turn on/off the vehicle itself                                            |
+| `vehicle:vdAILowerSelected(state)`    | Lower/raise the machine the player currently has selected                 |
+| `vehicle:vdAIFoldSelected(state)`     | Fold/unfold the machine the player currently has selected                 |
+| `vehicle:vdAIActivateSelected(state)` | Turn on/off the machine the player currently has selected                 |
 
 ```lua
 -- toggle the front implements' lowered state
@@ -123,6 +126,14 @@ vehicle:vdAILowerVehicle(true)
 The `*Vehicle` variants act on the controlled vehicle itself and pick the correct mechanism automatically: an
 integrated pickup (baler, forage wagon), the foldable *fold middle* position (self-propelled mower), or classic
 attacher-joint lowering. Each function is a no-op if the vehicle does not support the corresponding action.
+
+The `*Selected` variants act on whatever machine the player currently has selected, whether that is the vehicle
+itself or an implement at any depth of the rig. Unlike the position-addressed variants they act on that one
+machine only and do not cascade into implements attached to it, since the selection already names exactly one
+machine. They pick the same mechanism the `*Vehicle` variants do when the selected machine is not hitched to
+anything, so a self-propelled foldable such as a Krone BigM lowers through *fold middle* rather than no-opping.
+They are a no-op if nothing is selected. Use these to reach a machine that has no front/back position of its
+own, for example an implement hitched behind another implement.
 
 ## Development
 
