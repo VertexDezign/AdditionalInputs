@@ -3,6 +3,7 @@
 -- @author  Grisu118 - VertexDezign.net
 -- @history     v1.0.0.0 - 2025-03-23 - Initial implementation
 --              v1.1.0.0 - 2026-07-03 - Rename vd telemetry, expose implement functions on vehicle / implement
+--              v1.2.0.0 - 2026-08-24 - Expose implement functions addressed at the selected machine
 -- @Description: Registers additional input bindings
 -- @web: https://grisu118.ch or https://vertexdezign.net
 -- Copyright (C) Grisu118, All Rights Reserved.
@@ -17,7 +18,7 @@ AdditionalInputs = {}
 -- Increase this if breaking changes requires an update of VDTelemetry
 AdditionalInputs.MAJOR_VERSION = 1
 -- Increase this if a new feature is added and a depending mod requires it
-AdditionalInputs.MINOR_VERSION = 1
+AdditionalInputs.MINOR_VERSION = 2
 AdditionalInputs.SETTINGS_XML = "additionalInputsSettings.xml"
 AdditionalInputs.SETTINGS_XML_VERSION = 1
 

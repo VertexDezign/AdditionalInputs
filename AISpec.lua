@@ -37,6 +37,9 @@ function AdditionalInputsSpec.registerFunctions(vehicleType)
   SpecializationUtil.registerFunction(vehicleType, "vdAILowerVehicle", AdditionalInputsSpec.vdAILowerVehicle)
   SpecializationUtil.registerFunction(vehicleType, "vdAIFoldVehicle", AdditionalInputsSpec.vdAIFoldVehicle)
   SpecializationUtil.registerFunction(vehicleType, "vdAIActivateVehicle", AdditionalInputsSpec.vdAIActivateVehicle)
+  SpecializationUtil.registerFunction(vehicleType, "vdAILowerSelected", AdditionalInputsSpec.vdAILowerSelected)
+  SpecializationUtil.registerFunction(vehicleType, "vdAIFoldSelected", AdditionalInputsSpec.vdAIFoldSelected)
+  SpecializationUtil.registerFunction(vehicleType, "vdAIActivateSelected", AdditionalInputsSpec.vdAIActivateSelected)
 end
 
 function AdditionalInputsSpec:onLoad(savegame)
@@ -342,6 +345,69 @@ local function lowerObject(object, jointDescIndex, targetState, isPowered, power
   end
 end
 
+---Toggle (or set) the lowered state of a machine that is not attached to anything, picking the
+---mechanism it actually uses instead of the attacher-joint lowering used for implements.
+---@param vehicle table the self-propelled machine to act on
+---@param targetState boolean|nil when set, forces this state instead of toggling
+---@return boolean|nil newState the applied state, or nil if nothing was changed
+local function lowerVehicleItself(vehicle, targetState, isPowered, powerWarning, debugger)
+  -- Self-propelled machines with an integrated pickup (baler, forage wagon, ...) lower the pickup
+  -- through the Pickup spec, independent of folding.
+  local pickupSpec = vehicle.spec_pickup
+  if pickupSpec ~= nil and vehicle.setPickupState ~= nil then
+    local doLower = targetState
+    if doLower == nil then
+      doLower = not pickupSpec.isLowered
+    end
+    if vehicle:getCanChangePickupState(pickupSpec, doLower) then
+      debugger:trace("Lowering vehicle pickup, doLower: %s", tostring(doLower))
+      vehicle:setPickupState(doLower)
+      return doLower
+    end
+    return nil
+  end
+
+  -- Self-propelled machines (mower, ...) lower their integrated tool through the foldable
+  -- "fold middle" mechanism, not the attacher-joint lowering used for attached implements.
+  if vehicle.getIsFoldMiddleAllowed ~= nil and vehicle:getIsFoldMiddleAllowed() then
+    if not isPowered then
+      if powerWarning ~= nil then
+        g_currentMission:showBlinkingWarning(powerWarning, 2000)
+      end
+      return nil
+    end
+
+    local doLower = targetState
+    if doLower == nil and vehicle.getIsLowered ~= nil then
+      doLower = not vehicle:getIsLowered()
+    end
+    debugger:trace("Lowering vehicle via fold middle, doLower: %s", tostring(doLower))
+    vehicle:setFoldMiddleState(doLower)
+    return doLower
+  end
+
+  -- Fallback: classic attacher-joint based lowering
+  if vehicle.getAllowsLowering == nil or vehicle.setLoweredAll == nil then
+    return nil
+  end
+  return lowerObject(vehicle, nil, targetState, isPowered, powerWarning, debugger)
+end
+
+---Find the attacher joint an object is attached to on its attacher vehicle. Needed for the
+---selection-addressed actions, which reach an implement without walking the attacher joints.
+---@param object table
+---@return number|nil jointDescIndex nil if the object is not attached to anything
+local function getAttacherJointDescIndex(object)
+  if object.getAttacherVehicle == nil then
+    return nil
+  end
+  local attacherVehicle = object:getAttacherVehicle()
+  if attacherVehicle == nil or attacherVehicle.getAttacherJointIndexFromObject == nil then
+    return nil
+  end
+  return attacherVehicle:getAttacherJointIndexFromObject(object)
+end
+
 ---Toggle (or set) the folding state of a single object. Caller must ensure object.spec_foldable ~= nil.
 ---@param object table the vehicle or implement to act on
 ---@param targetState boolean|nil true folds, false unfolds; nil toggles
@@ -465,6 +531,79 @@ local function doActivate(vehicle, position, forceState)
   end, forceState)
 end
 
+---Resolves the machine the player currently has selected. The selection already names exactly one
+---machine, so unlike the position-addressed variants nothing is cascaded into child implements.
+---@param vehicle table the vehicle the spec runs on
+---@return table|nil selected the selected machine, or nil if nothing is selected
+local function getSelectedMachine(vehicle)
+  local debugger = vehicle.spec_additionalInputs.debugger
+  if vehicle.getSelectedVehicle == nil then
+    return nil
+  end
+
+  local selected = vehicle:getSelectedVehicle()
+  if selected == nil then
+    debugger:trace("Nothing selected, ignoring action")
+    return nil
+  end
+
+  debugger:trace(function()
+    return "Acting on selected machine: " .. tostring(selected.configFileName)
+  end)
+  return selected
+end
+
+---Toggle (or set) the lowered state of the currently selected machine.
+---@param vehicle table
+---@param forceState boolean|nil when set, forces this state instead of toggling
+local function doLowerSelected(vehicle, forceState)
+  local debugger = vehicle.spec_additionalInputs.debugger
+  debugger:trace("doLowerSelected called with forceState: %s", tostring(forceState))
+
+  local selected = getSelectedMachine(vehicle)
+  if selected == nil then
+    return
+  end
+
+  local isPowered, powerWarning = vehicle:getIsPowered()
+  if selected.getAttacherVehicle == nil or selected:getAttacherVehicle() == nil then
+    -- not hitched to anything, so it lowers like a vehicle rather than like an implement
+    lowerVehicleItself(selected, forceState, isPowered, powerWarning, debugger)
+    return
+  end
+  lowerObject(selected, getAttacherJointDescIndex(selected), forceState, isPowered, powerWarning, debugger)
+end
+
+---Toggle (or set) the folding state of the currently selected machine.
+---@param vehicle table
+---@param forceState boolean|nil true folds, false unfolds; nil toggles
+local function doFoldSelected(vehicle, forceState)
+  local debugger = vehicle.spec_additionalInputs.debugger
+  debugger:trace("doFoldSelected called with forceState: %s", tostring(forceState))
+
+  local selected = getSelectedMachine(vehicle)
+  if selected == nil or selected.spec_foldable == nil then
+    return
+  end
+
+  local isPowered, powerWarning = vehicle:getIsPowered()
+  foldObject(selected, forceState, isPowered, powerWarning, debugger)
+end
+
+---Toggle (or set) the turned-on state of the currently selected machine.
+---@param vehicle table
+---@param forceState boolean|nil when set, forces this state instead of toggling
+local function doActivateSelected(vehicle, forceState)
+  local debugger = vehicle.spec_additionalInputs.debugger
+  debugger:trace("doActivateSelected called with forceState: %s", tostring(forceState))
+
+  local selected = getSelectedMachine(vehicle)
+  if selected == nil then
+    return
+  end
+  activateObject(selected, forceState, debugger)
+end
+
 ---Toggle or set the lowered state of all implements attached at the front.
 ---@param forceState boolean|nil when set, forces this state instead of toggling
 function AdditionalInputsSpec:vdAILowerFront(forceState)
@@ -508,45 +647,7 @@ function AdditionalInputsSpec:vdAILowerVehicle(forceState)
   debugger:trace("vdAILowerVehicle called with forceState: %s", tostring(forceState))
   local isPowered, powerWarning = self:getIsPowered()
 
-  -- Self-propelled machines with an integrated pickup (baler, forage wagon, ...) lower the pickup
-  -- through the Pickup spec, independent of folding.
-  local pickupSpec = self.spec_pickup
-  if pickupSpec ~= nil and self.setPickupState ~= nil then
-    local doLower = forceState
-    if doLower == nil then
-      doLower = not pickupSpec.isLowered
-    end
-    if self:getCanChangePickupState(pickupSpec, doLower) then
-      debugger:trace("Lowering vehicle pickup, doLower: %s", tostring(doLower))
-      self:setPickupState(doLower)
-    end
-    return
-  end
-
-  -- Self-propelled machines (mower, ...) lower their integrated tool through the foldable
-  -- "fold middle" mechanism, not the attacher-joint lowering used for attached implements.
-  if self.getIsFoldMiddleAllowed ~= nil and self:getIsFoldMiddleAllowed() then
-    if not isPowered then
-      if powerWarning ~= nil then
-        g_currentMission:showBlinkingWarning(powerWarning, 2000)
-      end
-      return
-    end
-
-    local doLower = forceState
-    if doLower == nil and self.getIsLowered ~= nil then
-      doLower = not self:getIsLowered()
-    end
-    debugger:trace("Lowering vehicle via fold middle, doLower: %s", tostring(doLower))
-    self:setFoldMiddleState(doLower)
-    return
-  end
-
-  -- Fallback: classic attacher-joint based lowering
-  if self.getAllowsLowering == nil or self.setLoweredAll == nil then
-    return
-  end
-  lowerObject(self, nil, forceState, isPowered, powerWarning, debugger)
+  lowerVehicleItself(self, forceState, isPowered, powerWarning, debugger)
 end
 
 ---Toggle or set the folding state of the vehicle itself. No-op if the vehicle is not foldable.
@@ -567,6 +668,27 @@ function AdditionalInputsSpec:vdAIActivateVehicle(forceState)
   local debugger = self.spec_additionalInputs.debugger
   debugger:trace("vdAIActivateVehicle called with forceState: %s", tostring(forceState))
   activateObject(self, forceState, debugger)
+end
+
+---Toggle or set the lowered state of the machine the player currently has selected. Acts on that
+---machine only, not on implements attached to it. No-op if nothing is selected.
+---@param forceState boolean|nil when set, forces this state instead of toggling
+function AdditionalInputsSpec:vdAILowerSelected(forceState)
+  doLowerSelected(self, forceState)
+end
+
+---Toggle or set the folding state of the machine the player currently has selected. Acts on that
+---machine only, not on implements attached to it. No-op if nothing is selected.
+---@param forceState boolean|nil true folds, false unfolds; nil toggles
+function AdditionalInputsSpec:vdAIFoldSelected(forceState)
+  doFoldSelected(self, forceState)
+end
+
+---Toggle or set the turned-on state of the machine the player currently has selected. Acts on that
+---machine only, not on implements attached to it. No-op if nothing is selected.
+---@param forceState boolean|nil when set, forces this state instead of toggling
+function AdditionalInputsSpec:vdAIActivateSelected(forceState)
+  doActivateSelected(self, forceState)
 end
 
 function AdditionalInputsSpec:actionEventLower(actionName, inputValue, callbackState, isAnalog)

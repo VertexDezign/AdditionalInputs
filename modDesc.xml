@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="111">
     <author>VertexDezign</author>
-    <version>1.1.0.0</version>
+    <version>1.2.0.0</version>
     <title>
         <en>Additional Inputs</en>
         <de>Zusätzliche Eingaben</de>
@@ -49,6 +49,9 @@ Please report feedback or issues on Github.
 GitHub link: https://github.com/VertexDezign/AdditionalInputs
 
 Changelog:
+1.2.0.0:
+* Add public API to fold, lower and activate the currently selected machine
+
 1.1.0.0:
 * Support renamed vdTelemetry Mod
 * Add public API, which allows other mods to execute actions
@@ -96,6 +99,9 @@ Bitte melden Sie Feedback oder Probleme auf Github.
 GitHub-Link: https://github.com/VertexDezign/AdditionalInputs
 
 Changelog:
+1.2.0.0:
+* API hinzugefügt, um die aktuell ausgewählte Maschine ein-/auszuklappen, zu heben/senken und zu aktivieren
+
 1.1.0.0:
 * Unterstützung für den umbenannten vdTelemetry mod
 * API hinzugefügt, welche es anderen Mods erlaubt Aktionen auszuführen
