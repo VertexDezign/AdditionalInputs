@@ -74,7 +74,7 @@ jobs:
       # machine come out of one definition of "what is the mod" instead of CI keeping a second
       # list that silently drifts. Pinned to a release, not a branch, so nothing over there can
       # quietly change what ships from here; bump it deliberately and re-run the dry run.
-      FSTOOLS: git+https://github.com/VertexDezign/FSTools@v0.1.0
+      FSTOOLS: git+https://github.com/VertexDezign/FSTools@v0.2.1
     steps:
       - uses: actions/checkout@v7
         with:
