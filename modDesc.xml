@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="111">
     <author>VertexDezign</author>
-    <version>1.2.0.0</version>
+    <version>1.2.1.0</version>
     <title>
         <en>Additional Inputs</en>
         <de>Zusätzliche Eingaben</de>
@@ -49,6 +49,9 @@ Please report feedback or issues on Github.
 GitHub link: https://github.com/VertexDezign/AdditionalInputs
 
 Changelog:
+1.2.1.0:
+* Fix multiplayer issue where the vdTelemetry integration reacted to other players entering or leaving their vehicles
+
 1.2.0.0:
 * Add public API to fold, lower and activate the currently selected machine
 
@@ -99,6 +102,9 @@ Bitte melden Sie Feedback oder Probleme auf Github.
 GitHub-Link: https://github.com/VertexDezign/AdditionalInputs
 
 Changelog:
+1.2.1.0:
+* Mehrspieler-Fehler behoben, bei dem die vdTelemetry-Anbindung auf andere Spieler reagierte, die ihre Fahrzeuge betraten oder verliessen
+
 1.2.0.0:
 * API hinzugefügt, um die aktuell ausgewählte Maschine ein-/auszuklappen, zu heben/senken und zu aktivieren
 

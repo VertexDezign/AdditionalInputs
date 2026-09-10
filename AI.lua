@@ -4,6 +4,7 @@
 -- @history     v1.0.0.0 - 2025-03-23 - Initial implementation
 --              v1.1.0.0 - 2026-07-03 - Rename vd telemetry, expose implement functions on vehicle / implement
 --              v1.2.0.0 - 2026-08-24 - Expose implement functions addressed at the selected machine
+--              v1.2.1.0 - 2026-09-10 - Fix vdTelemetry integration reacting to other players in multiplayer
 -- @Description: Registers additional input bindings
 -- @web: https://grisu118.ch or https://vertexdezign.net
 -- Copyright (C) Grisu118, All Rights Reserved.

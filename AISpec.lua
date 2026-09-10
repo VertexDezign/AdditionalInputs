@@ -56,23 +56,42 @@ function AdditionalInputsSpec:onLoad(savegame)
   self.spec_additionalInputs.debugger:trace("onLoad")
 end
 
+---Called when a player enters this vehicle.
+---In multiplayer this is raised on every client for every player, so it also fires for
+---remote players entering their own vehicles. isControlling is only true for the local
+---player, everyone else must be ignored.
+---@param isControlling boolean true if the local player is the one controlling the vehicle
 function AdditionalInputsSpec:onEnterVehicle(isControlling)
-  if g_vdTelemetry ~= nil then
-    local spec = self.spec_additionalInputs
-    spec.debugger:trace(function()
-      return "onEnterVehicle(" .. tostring(isControlling) .. ")"
-    end)
+  local spec = self.spec_additionalInputs
+  spec.debugger:trace(function()
+    return "onEnterVehicle(" .. tostring(isControlling) .. ")"
+  end)
 
+  if not isControlling then
+    return
+  end
+
+  if g_vdTelemetry ~= nil then
     g_vdTelemetry:setCurrentVehicle(self)
   end
 end
 
+---Called when a player leaves this vehicle.
+---Same multiplayer semantics as onEnterVehicle: raised on every client for every player,
+---and additionally when a vehicle occupied by someone else is deleted or its player
+---disconnects. wasEntered is only true if the local player was the one inside.
+---@param wasEntered boolean true if the local player was controlling the vehicle
 function AdditionalInputsSpec:onLeaveVehicle(wasEntered)
+  local spec = self.spec_additionalInputs
+  spec.debugger:trace(function()
+    return "onLeaveVehicle(" .. tostring(wasEntered) .. ")"
+  end)
+
+  if not wasEntered then
+    return
+  end
+
   if g_vdTelemetry ~= nil then
-    local spec = self.spec_additionalInputs
-    spec.debugger:trace(function()
-      return "onLeaveVehicle(" .. tostring(wasEntered) .. ")"
-    end)
     g_vdTelemetry:clearCurrentVehicle()
   end
 end
